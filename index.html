@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday Nadia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --primary-color: #ff5e62;
+            --secondary-color: #ff9966;
+            --text-color: #4a4a4a;
+            --box-color: #9b59b6;
+            --ribbon-color: #f1c40f;
+        }
+
+        * { box-sizing: border-box; }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background: #ffe6fa;
+            background-image: radial-gradient(#ffcce6 20%, transparent 20%), radial-gradient(#ffcce6 20%, transparent 20%);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            overflow: hidden; /* Lock scroll until the end */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- UTILITY CLASSES --- */
+        .hidden { display: none !important; }
+        .fade-out { opacity: 0; pointer-events: none; transition: opacity 0.8s ease-out; }
+        .fade-in { opacity: 1; transition: opacity 1s ease-in; }
+
+        /* --- STAGE 1: THE ENVELOPE --- */
+        #stage-envelope { position: absolute; z-index: 10; text-align: center; }
+        
+        .envelope-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .envelope-wrapper:hover { transform: scale(1.05); }
+
+        .envelope {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            background: #ff758c;
+            border-radius: 5px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        
+        .envelope::before { /* Flap */
+            content: ''; position: absolute; top: 0; left: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 140px solid #ff5e62;
+            transform-origin: top;
+            transition: transform 0.6s ease;
+            z-index: 3;
+        }
+        
+        .envelope::after { /* Pocket */
+            content: ''; position: absolute; bottom: 0; left: 0;
+            width: 100%; height: 100%;
+            clip-path: polygon(0 0, 50% 40%, 100% 0, 100% 100%, 0 100%);
+            background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .wax-seal {
+            position: absolute; top: 110px; left: 50%; transform: translateX(-50%);
+            width: 45px; height: 45px;
+            background: #d4af37;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 1.2rem;
+            transition: opacity 0.4s;
+        }
+
+        .card-preview {
+            position: absolute; top: 10px; left: 20px; right: 20px; bottom: 0;
+            background: white; border-radius: 5px; z-index: 1;
+            transition: transform 0.6s ease;
+        }
+
+        .envelope-wrapper.open .envelope::before { transform: rotateX(180deg); z-index: 0; }
+        .envelope-wrapper.open .wax-seal { opacity: 0; }
+        .envelope-wrapper.open .card-preview { transform: translateY(-100px); transition-delay: 0.2s; }
+
+        .instruction { margin-top: 40px; color: #ff5e62; font-weight: 600; letter-spacing: 1px; animation: float 3s infinite; }
+
+        /* --- STAGE 2: THE BOX --- */
+        #stage-box { position: absolute; z-index: 10; text-align: center; }
+        
+        .box {
+            position: relative; width: 200px; height: 200px;
+            background: var(--box-color);
+            border-radius: 5px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transform-style: preserve-3d;
+            animation: bounceBox 2s infinite;
+        }
+        
+        .box-lid {
+            position: absolute; top: -30px; left: -10px;
+            width: 220px; height: 50px;
+            background: #8e44ad;
+            border-radius: 5px;
+            z-index: 2;
+            transition: transform 0.6s ease-out;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .box-ribbon-vertical { position: absolute; left: 90px; top: 0; width: 40px; height: 100%; background: var(--ribbon-color); }
+        .box-ribbon-horizontal { position: absolute; top: 90px; left: 0; height: 40px; width: 100%; background: var(--ribbon-color); }
+        .lid-ribbon { position: absolute; left: 90px; top: 0; width: 40px; height: 100%; background: #f39c12; }
+
+        .box.open .box-lid { transform: translateY(-150px) rotate(-15deg); opacity: 0; }
+        .box.open { animation: none; }
+
+        /* --- STAGE 3: THE CAKE --- */
+        #stage-cake { position: absolute; z-index: 5; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        
+        .cake {
+            position: relative; width: 300px; height: 200px;
+            background: #fce4ec; border-radius: 10px;
+            box-shadow: 0 10px 0 #f8bbd0, 0 20px 0 #f48fb1, 0 30px 40px rgba(0,0,0,0.1);
+            margin-bottom: 50px;
+            transform: scale(0.1); transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .frosting {
+            position: absolute; top: 0; left: 0; width: 100%; height: 60px;
+            background: #e91e63; border-radius: 10px 10px 30px 30px;
+        }
+        
+        .candle {
+            position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 60px;
+            background: repeating-linear-gradient(45deg, #fff, #fff 5px, #2196f3 5px, #2196f3 10px);
+            border-radius: 3px;
+        }
+        
+        .flame {
+            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 35px;
+            background: #ff9800; border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 20px #ffeb3b, 0 0 60px #ff5722;
+            animation: flicker 0.1s infinite alternate;
+        }
+
+        .btn-blow {
+            padding: 15px 40px; font-size: 1.2rem; border: none;
+            background: linear-gradient(45deg, #ff5e62, #ff9966);
+            color: white; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 94, 98, 0.4);
+            font-family: 'Poppins', sans-serif; font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .btn-blow:active { transform: scale(0.95); }
+
+        .smoke {
+            position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+            width: 10px; height: 10px; background: #aaa; border-radius: 50%;
+            opacity: 0;
+        }
+
+        /* --- STAGE 4: FINAL MESSAGE --- */
+        #stage-message {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 20;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-y: auto; padding: 40px 20px;
+        }
+
+        .polaroid-grid {
+            display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin: 40px 0;
+        }
+        
+        .polaroid {
+            background: white; padding: 15px 15px 40px 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: rotate(-3deg); transition: transform 0.3s;
+            width: 200px;
+        }
+        .polaroid:nth-child(2) { transform: rotate(3deg); margin-top: 20px; }
+        .polaroid:nth-child(3) { transform: rotate(-2deg); }
+        .polaroid:hover { transform: scale(1.1) rotate(0deg); z-index: 5; }
+        .polaroid img { width: 100%; height: auto; border: 1px solid #eee; }
+
+        h1 { font-family: 'Dancing Script', cursive; font-size: 4rem; color: #e91e63; margin-bottom: 10px; }
+        p.wish { font-size: 1.2rem; color: #555; max-width: 600px; line-height: 1.8; text-align: center; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes bounceBox { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes flicker { 0% { transform: translateX(-50%) scale(1); opacity: 1; } 100% { transform: translateX(-50%) scale(1.1); opacity: 0.9; } }
+        @keyframes windBlow { 0% { opacity: 0; transform: translateX(50px); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateX(-100px); } }
+        @keyframes smokeRise { 0% { opacity: 0.8; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(3); } }
+
+        .confetti { position: fixed; width: 10px; height: 10px; pointer-events: none; z-index: 100; }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="birthday_song.mp3" type="audio/mp3">
+    </audio>
+
+    <div id="stage-envelope">
+        <div class="envelope-wrapper" onclick="openEnvelope()">
+            <div class="envelope">
+                <div class="card-preview"></div>
+                <div class="wax-seal">N</div> </div>
+        </div>
+        <div class="instruction">A letter for Nadia...</div>
+    </div>
+
+    <div id="stage-box" class="hidden">
+        <div class="box" onclick="openBox()">
+            <div class="box-lid">
+                <div class="lid-ribbon"></div>
+            </div>
+            <div class="box-ribbon-vertical"></div>
+            <div class="box-ribbon-horizontal"></div>
+        </div>
+        <div class="instruction">You got a gift!</div>
+    </div>
+
+    <div id="stage-cake" class="hidden">
+        <div class="cake" id="cake-el">
+            <div class="frosting"></div>
+            <div class="candle">
+                <div class="flame" id="flame"></div>
+                <div class="smoke" id="smoke"></div>
+            </div>
+        </div>
+        <div style="height: 50px;"></div>
+        <button class="btn-blow" id="blowBtn" onclick="blowCandle()">Make a Wish & Blow 💨</button>
+    </div>
+
+    <div id="stage-message" class="hidden fade-out">
+        <h1>Happy Birthday Nadia! 🎉</h1>
+        
+        <p class="wish">
+            I hope your day is as bright as your smile and as beautiful as you are. 
+            Here's to another year of amazing memories, laughter, and success. 
+            You deserve the world!
+        </p>
+
+        <div class="polaroid-grid">
+            <div class="polaroid">
+                <img src="photo1.jpeg" alt="Memory">
+            </div>
+            <div class="polaroid">
+                <img src="photo2.jpeg" alt="Memory">
+            </div>
+            <div class="polaroid">
+                <img src="photo3.jpeg" alt="Memory">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- LOGIC ---
+        
+        function openEnvelope() {
+            document.querySelector('.envelope-wrapper').classList.add('open');
+            document.querySelector('.instruction').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('stage-envelope').classList.add('fade-out');
+                setTimeout(() => {
+                    document.getElementById('stage-envelope').classList.add('hidden');
+                    document.getElementById('stage-box').classList.remove('hidden');
+                    document.getElementById('stage-box').classList.add('fade-in');
+                }, 800);
+            }, 1000);
+        }
+
+        function openBox() {
+            // Play Music
+            const music = document.getElementById('bg-music');
+            music.volume = 0.4;
+            music.play().catch(e => console.log("Audio requires interaction"));
+
+            const box = document.querySelector('.box');
+            box.classList.add('open');
+            
+            setTimeout(() => {
+                document.getElementById('stage-box').classList.add('fade-out');
+                setTimeout(() => {
+                    document.getElementById('stage-box').classList.add('hidden');
+                    const cakeStage = document.getElementById('stage-cake');
+                    cakeStage.classList.remove('hidden');
+                    // Pop up cake
+                    setTimeout(() => {
+                        document.getElementById('cake-el').style.transform = 'scale(1)';
+                    }, 100);
+                }, 800);
+            }, 800);
+        }
+
+        function blowCandle() {
+            const flame = document.getElementById('flame');
+            const smoke = document.getElementById('smoke');
+            const btn = document.getElementById('blowBtn');
+            
+            // 1. Wind Animation effect could go here, but we'll simulate by flicker
+            flame.style.animation = 'flicker 0.05s infinite'; // Shake fast
+            btn.innerHTML = "Wooooosh...";
+            
+            setTimeout(() => {
+                // 2. Extinguish
+                flame.style.opacity = '0';
+                smoke.style.animation = 'smokeRise 2s forwards';
+                
+                // 3. Explode Sequence
+                setTimeout(triggerExplosion, 1500);
+            }, 1000);
+        }
+
+        function triggerExplosion() {
+            const cake = document.getElementById('cake-el');
+            const btn = document.getElementById('blowBtn');
+            
+            btn.style.opacity = '0';
+            
+            // Big expansion
+            cake.style.transition = 'transform 0.5s ease-in, opacity 0.5s';
+            cake.style.transform = 'scale(20)';
+            cake.style.opacity = '0';
+            
+            createConfetti(100);
+            
+            // Show Final Screen
+            setTimeout(() => {
+                document.getElementById('stage-cake').classList.add('hidden');
+                document.body.style.overflow = 'auto'; // Enable scroll
+                
+                const final = document.getElementById('stage-message');
+                final.classList.remove('hidden');
+                setTimeout(() => {
+                    final.classList.remove('fade-out');
+                    final.classList.add('fade-in');
+                    createConfetti(50); // More confetti on final screen
+                }, 100);
+            }, 600);
+        }
+
+        // --- PARTICLE SYSTEM ---
+        function createConfetti(amount) {
+            const colors = ['#e91e63', '#2196f3', '#ffeb3b', '#4caf50', '#9c27b0'];
+            
+            for(let i=0; i<amount; i++) {
+                const conf = document.createElement('div');
+                conf.classList.add('confetti');
+                document.body.appendChild(conf);
+                
+                const bg = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.background = bg;
+                
+                const x = Math.random() * window.innerWidth;
+                const y = window.innerHeight / 2; // Start from middle
+                
+                conf.style.left = x + 'px';
+                conf.style.top = y + 'px';
+                
+                // Random explosion velocity
+                const destX = (Math.random() - 0.5) * 500;
+                const destY = (Math.random() - 0.5) * 500 - 500; // Mostly up
+                const rotate = Math.random() * 360;
+                
+                conf.style.transition = 'transform 1.5s ease-out, opacity 1.5s';
+                
+                requestAnimationFrame(() => {
+                    conf.style.transform = `translate(${destX}px, ${destY}px) rotate(${rotate}deg)`;
+                    conf.style.opacity = '0';
+                });
+                
+                setTimeout(() => conf.remove(), 2000);
+            }
+        }
+    </script>
+</body>
+</html>
